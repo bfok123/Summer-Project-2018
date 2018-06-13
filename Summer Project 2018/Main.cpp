@@ -10,6 +10,8 @@ void init() {
 	GLFWwindow* window = glfwCreateWindow(50, 50, "boop", NULL, NULL);
 	glfwMakeContextCurrent(window);
 	glfwGetFramebufferSize(window, 50, 50);
+	boop boopity boop bop bippity bop boop
+	
 }
 
 void update() {
