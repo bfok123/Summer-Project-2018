@@ -45,9 +45,16 @@ void update() {
 }
 
 void render() {
-	/*
-	We need to learn how to render vertices
-	*/
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glBegin(GL_TRIANGLES);
+
+	glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glVertex3f(1.0f, 0.0f, 0.0f);
+	glVertex3f(0.0f, 1.0f, 0.0f);
+	
+	glEnd();
 }
 
 void loop() {
@@ -60,7 +67,7 @@ void loop() {
 int main() {
 	int width = 1600;
 	int height = 900;
-	int scale = 3;
+	int scale = 1;
 	const char* title = "boop"; //why tf isn't this working
 	init(width, height, scale, title);
 	loop();
