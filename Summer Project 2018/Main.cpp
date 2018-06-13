@@ -1,25 +1,53 @@
 #include "Vector.h"
-#include <iostream>
 #include "GLFW\glfw3.h"
+#include <iostream>
+#include "Window.h"
 
 bool running;
 
-void init() {
-	running = true;
+void init(int windowWidth, int windowHeight, int windowScale, const char* title) {
 	glfwInit();
-	GLFWwindow* window = glfwCreateWindow(50, 50, "boop", NULL, NULL);
-	glfwMakeContextCurrent(window);
-	glfwGetFramebufferSize(window, 50, 50);
-	boop boopity boop bop bippity bop boop
-	
+	Window::window = glfwCreateWindow(Window::width = Window::widthRes = windowWidth,
+									  Window::height = Window::heightRes = windowHeight, 
+									  Window::title = title, NULL, NULL);
+
+
+	//GLFW STUFF
+	glfwMakeContextCurrent(Window::window);
+	int width, height;
+	glfwGetFramebufferSize(Window::window, &width, &height);
+	glfwSwapInterval(0); //V-Sync stuff
+	const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+	//Sets the center of the screen
+	int xPos = (mode->width - (width * windowScale)) / 2;
+	int yPos = (mode->height - (height * windowScale)) / 2;
+	glfwSetWindowPos(Window::window, xPos, yPos);
+
+	//Callbacks
+	// TODO
+
+	//GL (Honestly, just do this once, never understood
+	glViewport(0, 0, width, height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity(); //Specific ID that the GPU program runs on
+	glOrtho(0, width, 0, height, -10, 10); //This is camera stuff; -10 and 10 is for layering
+	glDepthRange(-10, 10);
+	glMatrixMode(GL_MODELVIEW);
+
+	//^^^ IDK HOW MUCH OF THIS IS RELEVANT FOR 3D
+
+
+	running = true;
 }
 
 void update() {
-
+	running = !glfwWindowShouldClose(Window::window);
 }
 
 void render() {
-
+	/*
+	We need to learn how to render vertices
+	*/
 }
 
 void loop() {
@@ -30,6 +58,10 @@ void loop() {
 }
 
 int main() {
-	
-	
+	int width = 1600;
+	int height = 900;
+	int scale = 3;
+	const char* title = "boop"; //why tf isn't this working
+	init(width, height, scale, title);
+	loop();
 }
