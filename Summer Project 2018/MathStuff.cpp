@@ -86,7 +86,7 @@ Matrix::Matrix(int rows, int cols) : rows(rows), cols(cols) {
 	elements = new float[rows * cols];
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < cols; j++) {
-			elements[j + i * cols] = 0;
+			elements[i + j * cols] = 0;
 		}
 	}
 	
@@ -98,46 +98,66 @@ Matrix::Matrix(int rows, int cols) : rows(rows), cols(cols) {
 	}
 }
 
-Matrix* Matrix::operator+(Matrix& m) {
-	if (this->rows == m.rows && this->cols == m.cols) {
-		Matrix* result = new Matrix(this->rows, this->cols);
-		for (int i = 0; i < this->rows; i++) {
-			for (int j = 0; j < this->cols; j++) {
-				result->elements[j + i * result->cols] = this->elements[j + i * this->cols] + m.elements[j + i * m.cols];
+Matrix& Matrix::add(const Matrix& m) {
+	for (int i = 0; i < this->rows * this->cols; i++) {
+		this->elements[i] += m.elements[i];
+	}
+	return *this;
+}
+
+Matrix& Matrix::operator=(Matrix& m) {
+	Matrix* result = new Matrix(m.rows, m.cols);
+	for (int i = 0; i < m.rows * m.cols; i++) {
+		result->elements[i] = m.elements[i];
+	}
+	std::cout << "oh hi mark";
+	return *result;
+}
+
+Matrix& operator+(Matrix& m1, const Matrix& m2) {
+	/*
+	if (m1.rows == m2.rows && m1.cols == m2.cols) {
+		for (int i = 0; i < m1.rows; i++) {
+			for (int j = 0; j < m1.cols; j++) {
+				m1.elements[i + j * m1.cols] = m1.elements[i + j * m1.cols] + m2.elements[i + j * m2.cols];
 			}
 		}
-		return result;
+		std::cout << "oh hi mark 2";
 	}
 	else {
 		std::cout << "Rows and columns must be equal to add matrices.";
-		return nullptr;
+		std::cout << std::endl;
 	}
-	
+	return *this; */
+	return m1.add(m2);
 }
+
 
 Matrix* Matrix::operator-(Matrix& m) {
 	if (this->rows == m.rows && this->cols == m.cols) {
 		Matrix* result = new Matrix(this->rows, this->cols);
 		for (int i = 0; i < this->rows; i++) {
 			for (int j = 0; j < this->cols; j++) {
-				result->elements[j + i * result->cols] = this->elements[j + i * this->cols] - m.elements[j + i * m.cols];
+				result->elements[i + j * result->cols] = this->elements[i + j * this->cols] - m.elements[i + j * m.cols];
 			}
 		}
 		return result;
 	}
 	else {
 		std::cout << "Rows and columns must be equal to subtract matrices.";
+		std::cout << std::endl;
 		return nullptr;
 	}
 }
 
 Matrix* Matrix::operator*(Matrix& m) {
 	if (this->cols == m.rows) {
-		Matrix* result = Matrix::zero(new Matrix(this->rows, m.cols));
+		Matrix* result = new Matrix(this->rows, m.cols);
+		result->zero();
 		for (int i = 0; i < this->rows; i++) {
 			for (int j = 0; j < m.cols; j++) {
 				for (int k = 0; k < m.rows; k++) {
-					result->elements[j + i * result->cols] += m.elements[j + k * m.cols] * this->elements[k + i * this->cols];
+					result->elements[i + j * result->cols] += m.elements[k + j * m.cols] * this->elements[i + k * this->cols];
 				}
 			}
 		}
@@ -145,6 +165,7 @@ Matrix* Matrix::operator*(Matrix& m) {
 	}
 	else {
 		std::cout << "Columns must be equal to rows of other matrix to multiply matrices.";
+		std::cout << std::endl;
 		return nullptr;
 	}
 }
@@ -154,13 +175,14 @@ Vector* Matrix::operator*(Vector& v) {
 		Vector* result = new Vector(0, 0, 0);
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 4; j++) {
-				result->elements[i] += v.elements[j] * this->elements[j + i * cols];
+				result->elements[i] += v.elements[j] * this->elements[i + j * cols];
 			}
 		}
 		return result;
 	}
 	else {
 		std::cout << "Must multiply vector by a 4x4 matrix.";
+		std::cout << std::endl;
 		return nullptr;
 	}
 }
@@ -169,14 +191,14 @@ Matrix* Matrix::operator*(float scalar) {
 	Matrix* result = new Matrix(this->rows, this->cols);
 	for (int i = 0; i < this->rows; i++) {
 		for (int j = 0; j < this->cols; j++) {
-			result->elements[j + i * cols] = scalar * this->elements[j + i * cols];
+			result->elements[i + j * cols] = scalar * this->elements[i + j * cols];
 		}
 	}
 	return result;
 }
 
-Matrix* Matrix::rotate(Matrix* m, float angle, Vector* rotationAxis) {
-	if (m->rows == 4 && m->cols == 4) {
+void Matrix::rotate(float angle, Vector* rotationAxis) {
+	if (this->rows == 4 && this->cols == 4) {
 		angle = degreesToRadians(angle);
 		Matrix* result = new Matrix(4, 4);
 		// https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
@@ -185,94 +207,102 @@ Matrix* Matrix::rotate(Matrix* m, float angle, Vector* rotationAxis) {
 		// Rotation matrix
 		Matrix* u = new Matrix(3, 1);
 		for (int i = 0; i < 3; i++) {
-			u->elements[i * u->cols] = rotationAxis->elements[i];
+			u->elements[i] = rotationAxis->elements[i];
 		}
-		Matrix* tensorProd = *u * *Matrix::transpose(u);
+		
+		Matrix* tensorProd = u;
+		std::cout << tensorProd->rows << " " << tensorProd->cols;
+		std::cout << std::endl;
+		u->transpose();
+		std::cout << tensorProd->rows << " " << tensorProd->cols;
+		tensorProd = *tensorProd * *u;
 		
 		// Yeah, I hard coded this bc I don't know how it's derived
 		Matrix* crossProductMat = new Matrix(3, 3);
-		crossProductMat = Matrix::zero(crossProductMat);
-		crossProductMat->elements[1] = -rotationAxis->elements[Coords::Z];
-		crossProductMat->elements[2] = rotationAxis->elements[Coords::Y];
-		crossProductMat->elements[3] = rotationAxis->elements[Coords::Z];
-		crossProductMat->elements[5] = -rotationAxis->elements[Coords::X];
-		crossProductMat->elements[6] = -rotationAxis->elements[Coords::Y];
-		crossProductMat->elements[7] = rotationAxis->elements[Coords::X];
+		crossProductMat->elements[1] = rotationAxis->elements[Coords::Z];
+		crossProductMat->elements[2] = -rotationAxis->elements[Coords::Y];
+		crossProductMat->elements[3] = -rotationAxis->elements[Coords::Z];
+		crossProductMat->elements[5] = rotationAxis->elements[Coords::X];
+		crossProductMat->elements[6] = rotationAxis->elements[Coords::Y];
+		crossProductMat->elements[7] = -rotationAxis->elements[Coords::X];
 		
 		Matrix* rotation = new Matrix(3, 3);
-		rotation = *(*rotation * (float) cos(angle)) + *(*crossProductMat * (float) sin(angle));
-		rotation = *rotation + *(*tensorProd * (1.0f - (float) cos(angle)));
+		//rotation = *(*rotation * (float) cos(angle)) + *(*crossProductMat * (float) sin(angle));
+		//rotation = *rotation + *(*tensorProd * (1.0f - (float) cos(angle)));
 
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				result->elements[j + i * 4] = rotation->elements[j + i * 3];
+				result->elements[i + j * 4] = rotation->elements[i + j * 3];
 			}
 		}
-		return *result * *m;
+		this->elements = (*result * *this)->elements;
 	}
 	else {
 		std::cout << "Given matrix must be 4x4 to turn into rotation matrix.";
+		std::cout << std::endl;
 	}
 }
 
-Matrix* Matrix::translate(Matrix* m, float x, float y, float z) {
-	if (m->rows == 4 && m->cols == 4) {
+void Matrix::translate(float x, float y, float z) {
+	if (this->rows == 4 && this->cols == 4) {
 		Matrix* result = new Matrix(4, 4);
-		result->elements[3] = x;
-		result->elements[7] = y;
-		result->elements[11] = z;
-		return *result * *m;
+		result->elements[12] = x;
+		result->elements[13] = y;
+		result->elements[14] = z;
+		this->elements = (*result * *this)->elements;
 	}
 	else {
 		std::cout << "Given matrix must be 4x4 to turn into translation matrix.";
-		return nullptr;
+		std::cout << std::endl;
 	}
 }
 
-Matrix* Matrix::translate(Matrix* m, Vector& v) {
-	if (m->rows == 4 && m->cols == 4) {
+void Matrix::translate(Vector& v) {
+	if (this->rows == 4 && this->cols == 4) {
 		Matrix* result = new Matrix(4, 4);
 		for (int i = 0; i < 3; i++) {
-			result->elements[3 + i * 4] = v.elements[i];
+			result->elements[i + 3 * 4] = v.elements[i];
 		}
-		return *result * *m;
+		this->elements = (*result * *this)->elements;
 	}
 	else {
 		std::cout << "Given matrix must be 4x4 to turn into translation matrix.";
-		return nullptr;
+		std::cout << std::endl;
 	}
 }
 
-Matrix* Matrix::transpose(Matrix* m) {
-	Matrix* result = new Matrix(m->cols, m->rows);
-	for (int i = 0; i < m->rows; i++) {
-		for (int j = 0; j < m->cols; j++) {
-			result->elements[i + j * m->rows] = m->elements[j + i * m->cols];
+void Matrix::transpose() {
+	Matrix* result = new Matrix(this->cols, this->rows);
+	for (int i = 0; i < this->rows; i++) {
+		for (int j = 0; j < this->cols; j++) {
+			result->elements[j + i * this->rows] = this->elements[i + j * this->cols];
 		}
 	}
-	return result;
+	this->elements = result->elements;
+	this->rows = result->rows;
+	this->cols = result->cols;
 }
 
-// possibly take in rows and cols instead of a matrix?
-Matrix* Matrix::identity(Matrix* m) {
-	if (m->rows == m->cols) {
-		Matrix* result = new Matrix(m->rows, m->cols);
-		return result;
+void Matrix::identity() {
+	if (this->rows == this->cols) {
+		for (int i = 0; i < this->cols; i++) {
+			this->elements[i + i * this->cols] = 1;
+		}
 	}
 	else {
 		std::cout << "Given matrix must be a square matrix in order to create an identity matrix.";
-		return nullptr;
+		std::cout << std::endl;
 	}
 }
 
-Matrix* Matrix::zero(Matrix* m) {
-	Matrix* result = new Matrix(m->rows, m->cols);
-	for (int i = 0; i < m->rows; i++) {
-		for (int j = 0; j < m->cols; j++) {
-			result->elements[j + i * m->cols] = 0;
+void Matrix::zero() {
+	for (int i = 0; i < this->rows; i++) {
+		for (int j = 0; j < this->cols; j++) {
+			this->elements[i + j * this->cols] = 0;
 		}
 	}
-	return result;
 }
+
+
 
 

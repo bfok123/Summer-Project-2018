@@ -33,23 +33,30 @@ struct Vector {
 };
 
 struct Matrix {
-	float *elements;
+	//float *elements;
+	float elements[16];
 	int rows, cols;
 	
 	Matrix(int rows, int cols);
 
-	Matrix* operator+(Matrix& m);
+	Matrix& add(const Matrix& m);
+	
+	Matrix& operator=(Matrix& m);
+	friend Matrix& operator+(Matrix& m1, const Matrix& m2); 
 	Matrix* operator-(Matrix& m);
 	Matrix* operator*(Matrix& m);
 	Vector* operator*(Vector& m);
 	Matrix* operator*(float scalar);
 
-	static Matrix* rotate(Matrix* m, float angle, Vector* rotationAxis);
-	static Matrix* translate(Matrix* m, float x, float y, float z);
-	static Matrix* translate(Matrix* m, Vector& v);
-	static Matrix* transpose(Matrix* m);
-	static Matrix* identity(Matrix* m);
-	static Matrix* zero(Matrix* m);
+	void rotate(float angle, float x, float y, float z);
+	void rotate(float angle, Vector* rotationAxis);
+	void translate(float x, float y, float z);
+	void translate(Vector& v);
+	void transpose();
+	void identity();
+	void zero();
+	void scale(float scalar); // uniform scale
+	void scale(float x, float y, float z); // scale on each axis
 };
 
 #endif

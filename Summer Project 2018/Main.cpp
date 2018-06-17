@@ -4,7 +4,7 @@
 #include "Window.h"
 
 bool running;
-Matrix* rotate = new Matrix(4, 4);
+//Matrix rotate = new Matrix(4, 4);
 
 void init(int windowWidth, int windowHeight, int windowScale, const char* title) {
 	glfwInit();
@@ -41,11 +41,34 @@ void init(int windowWidth, int windowHeight, int windowScale, const char* title)
 	glShadeModel(GL_SMOOTH);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
+	Matrix rotate(4, 4);
+	std::cout << "rotate before";
+	std::cout << std::endl;
+	for (int i = 0; i < rotate.rows; i++) {
+		for (int j = 0; j < rotate.cols; j++) {
+			std::cout << rotate.elements[j + i * rotate.cols] << " ";
+		}
+		std::cout << std::endl;
+	}
+	Matrix rotate2 = rotate + rotate;
 	//^^^ IDK HOW MUCH OF THIS IS RELEVANT FOR 3D
-
+	for (int i = 0; i < rotate.rows; i++) {
+		for (int j = 0; j < rotate.cols; j++) {
+			std::cout << rotate2.elements[j + i * rotate.cols] << " ";
+		}
+		std::cout << std::endl;
+	}
+	std::cout << "rotate after";
+	std::cout << std::endl;
+	for (int i = 0; i < rotate.rows; i++) {
+		for (int j = 0; j < rotate.cols; j++) {
+			std::cout << rotate.elements[j + i * rotate.cols] << " ";
+		}
+		std::cout << std::endl;
+	}
 	glfwSetWindowSize(Window::window, windowWidth * windowScale, windowHeight * windowScale);
-	rotate = Matrix::rotate(rotate, 0.1f, new Vector(0, 0.2f, 0));
-	//rotate = Matrix::translate(rotate, 0.001f, 0.0f, 0.0f);
+	//rotate->rotate(0.1f, new Vector(0, 0.2f, 0));
+	//rotate->translate(0.001f, 0.0f, 0.0f);
 	running = true;
 }
 
@@ -64,19 +87,19 @@ Vector* br3 = new Vector(0.0f, -0.5f, -0.5f);
 
 void update() {
 	running = !glfwWindowShouldClose(Window::window);
-	
-	fl1 = *rotate * *fl1;
-	fl2 = *rotate * *fl2;
-	fl3 = *rotate * *fl3;
-	fr1 = *rotate * *fr1;
-	fr2 = *rotate * *fr2;
-	fr3 = *rotate * *fr3;
-	bl1 = *rotate * *bl1;
-	bl2 = *rotate * *bl2;
-	bl3 = *rotate * *bl3;
-	br1 = *rotate * *br1;
-	br2 = *rotate * *br2;
-	br3 = *rotate * *br3;
+	/*
+	fl1 = rotate * *fl1;
+	fl2 = rotate * *fl2;
+	fl3 = rotate * *fl3;
+	fr1 = rotate * *fr1;
+	fr2 = rotate * *fr2;
+	fr3 = rotate * *fr3;
+	bl1 = rotate * *bl1;
+	bl2 = rotate * *bl2;
+	bl3 = rotate * *bl3;
+	br1 = rotate * *br1;
+	br2 = rotate * *br2;
+	br3 = rotate * *br3;*/
 }
 
 void render() {
