@@ -50,14 +50,9 @@ void init(int windowWidth, int windowHeight, int windowScale, const char* title)
 		}
 		std::cout << std::endl;
 	}
-	Matrix rotate2 = rotate + rotate;
+	Matrix rotate2(4, 4);
+	Matrix rotate3 = rotate + rotate2;
 	//^^^ IDK HOW MUCH OF THIS IS RELEVANT FOR 3D
-	for (int i = 0; i < rotate.rows; i++) {
-		for (int j = 0; j < rotate.cols; j++) {
-			std::cout << rotate2.elements[j + i * rotate.cols] << " ";
-		}
-		std::cout << std::endl;
-	}
 	std::cout << "rotate after";
 	std::cout << std::endl;
 	for (int i = 0; i < rotate.rows; i++) {
@@ -66,6 +61,7 @@ void init(int windowWidth, int windowHeight, int windowScale, const char* title)
 		}
 		std::cout << std::endl;
 	}
+	
 	glfwSetWindowSize(Window::window, windowWidth * windowScale, windowHeight * windowScale);
 	//rotate->rotate(0.1f, new Vector(0, 0.2f, 0));
 	//rotate->translate(0.001f, 0.0f, 0.0f);

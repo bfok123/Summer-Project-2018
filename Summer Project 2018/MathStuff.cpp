@@ -83,7 +83,7 @@ Vector* Vector::translate(Vector& v) {
 }
 
 Matrix::Matrix(int rows, int cols) : rows(rows), cols(cols) {
-	elements = new float[rows * cols];
+	elements[rows * cols];
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < cols; j++) {
 			elements[i + j * cols] = 0;
@@ -98,39 +98,39 @@ Matrix::Matrix(int rows, int cols) : rows(rows), cols(cols) {
 	}
 }
 
-Matrix& Matrix::add(const Matrix& m) {
-	for (int i = 0; i < this->rows * this->cols; i++) {
-		this->elements[i] += m.elements[i];
+Matrix& Matrix::add(const Matrix& right) {
+	for (int i = 0; i < rows * cols; i++) {
+		elements[i] = elements[i] + right.elements[i];
 	}
 	return *this;
 }
 
-Matrix& Matrix::operator=(Matrix& m) {
-	Matrix* result = new Matrix(m.rows, m.cols);
-	for (int i = 0; i < m.rows * m.cols; i++) {
-		result->elements[i] = m.elements[i];
-	}
-	std::cout << "oh hi mark";
-	return *result;
+Matrix& Matrix::operator=(Matrix right) {
+	std::swap(this->elements, right.elements);
+	std::swap(this->rows, right.rows);
+	std::swap(this->cols, right.cols);
+	return *this;
 }
 
-Matrix& operator+(Matrix& m1, const Matrix& m2) {
-	/*
-	if (m1.rows == m2.rows && m1.cols == m2.cols) {
-		for (int i = 0; i < m1.rows; i++) {
-			for (int j = 0; j < m1.cols; j++) {
-				m1.elements[i + j * m1.cols] = m1.elements[i + j * m1.cols] + m2.elements[i + j * m2.cols];
+Matrix operator+(Matrix left, const Matrix& right) {
+	return left.add(right);
+}
+
+Matrix& Matrix::operator+=(const Matrix& right) {
+	if (this->rows == right.rows && this->cols == right.cols) {
+		for (int i = 0; i < this->rows; i++) {
+			for (int j = 0; j < this->cols; j++) {
+				this->elements[i + j * this->cols] = this->elements[i + j * this->cols] + right.elements[i + j * right.cols];
 			}
 		}
-		std::cout << "oh hi mark 2";
-	}
-	else {
+	} else {
 		std::cout << "Rows and columns must be equal to add matrices.";
 		std::cout << std::endl;
 	}
-	return *this; */
-	return m1.add(m2);
+	return *this;
 }
+
+
 
 
 Matrix* Matrix::operator-(Matrix& m) {
@@ -211,10 +211,7 @@ void Matrix::rotate(float angle, Vector* rotationAxis) {
 		}
 		
 		Matrix* tensorProd = u;
-		std::cout << tensorProd->rows << " " << tensorProd->cols;
-		std::cout << std::endl;
 		u->transpose();
-		std::cout << tensorProd->rows << " " << tensorProd->cols;
 		tensorProd = *tensorProd * *u;
 		
 		// Yeah, I hard coded this bc I don't know how it's derived
@@ -235,7 +232,7 @@ void Matrix::rotate(float angle, Vector* rotationAxis) {
 				result->elements[i + j * 4] = rotation->elements[i + j * 3];
 			}
 		}
-		this->elements = (*result * *this)->elements;
+		//this->elements = (*result * *this)->elements;
 	}
 	else {
 		std::cout << "Given matrix must be 4x4 to turn into rotation matrix.";
@@ -249,7 +246,7 @@ void Matrix::translate(float x, float y, float z) {
 		result->elements[12] = x;
 		result->elements[13] = y;
 		result->elements[14] = z;
-		this->elements = (*result * *this)->elements;
+		//this->elements = (*result * *this)->elements;
 	}
 	else {
 		std::cout << "Given matrix must be 4x4 to turn into translation matrix.";
@@ -263,7 +260,7 @@ void Matrix::translate(Vector& v) {
 		for (int i = 0; i < 3; i++) {
 			result->elements[i + 3 * 4] = v.elements[i];
 		}
-		this->elements = (*result * *this)->elements;
+		//this->elements = (*result * *this)->elements;
 	}
 	else {
 		std::cout << "Given matrix must be 4x4 to turn into translation matrix.";
@@ -278,7 +275,7 @@ void Matrix::transpose() {
 			result->elements[j + i * this->rows] = this->elements[i + j * this->cols];
 		}
 	}
-	this->elements = result->elements;
+	//this->elements = result->elements;
 	this->rows = result->rows;
 	this->cols = result->cols;
 }

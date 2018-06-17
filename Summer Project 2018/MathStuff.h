@@ -38,15 +38,19 @@ struct Matrix {
 	int rows, cols;
 	
 	Matrix(int rows, int cols);
+	Matrix& add(const Matrix& right);
 
-	Matrix& add(const Matrix& m);
+	Matrix& operator=(Matrix right);
+	Matrix& operator+=(const Matrix& right);
+	Matrix& operator-=(const Matrix& right);
+	Matrix& operator*=(const Matrix& right);
+	Matrix& operator*=(const Vector& right);
+	// operator==
 	
-	Matrix& operator=(Matrix& m);
-	friend Matrix& operator+(Matrix& m1, const Matrix& m2); 
-	Matrix* operator-(Matrix& m);
-	Matrix* operator*(Matrix& m);
-	Vector* operator*(Vector& m);
-	Matrix* operator*(float scalar);
+	friend Matrix operator+(Matrix left, const Matrix& right);
+	friend Matrix operator-(Matrix left, const Matrix& right);
+	friend Matrix operator*(Matrix left, const Matrix& right);
+	friend Vector operator*(Matrix left, const Vector& right);
 
 	void rotate(float angle, float x, float y, float z);
 	void rotate(float angle, Vector* rotationAxis);
@@ -58,5 +62,7 @@ struct Matrix {
 	void scale(float scalar); // uniform scale
 	void scale(float x, float y, float z); // scale on each axis
 };
+
+
 
 #endif
