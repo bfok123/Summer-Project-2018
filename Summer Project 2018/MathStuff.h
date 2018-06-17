@@ -16,35 +16,36 @@ struct Point {
 };
 
 struct Vector {
-	float *elements;
+	float elements[4];
 
 	Vector(float x, float y, float z);
-	Vector* operator+(Vector& v);
-	Vector* operator-(Vector& v);
-	Vector* operator*(Vector& v); // cross product bc mark likes to do bad operator overloading
-	Vector* operator*(float scalar);
-	float dot(Vector& v);
-	void rotate(float xy, float yz, float xz);
-	Vector* translate(float x, float y, float z);
-	Vector* translate(Vector& v);
-	
-	static float magnitude(Vector* v);
-	static Vector* normalize(Vector* v);
+
+	//Vector& operator=(Vector right);
+	Vector& operator+=(const Vector& right);
+	Vector& operator-=(const Vector& right);
+	Vector& operator*=(const Vector& right);
+
+	friend Vector operator+(Vector left, const Vector& right);
+	friend Vector operator-(Vector left, const Vector& right);
+	friend Vector operator*(Vector left, const Vector& right); // cross product bc mark likes to do bad operator overloading
+
+	float dot(Vector& right);
+	float magnitude();
+	void normalize();
+	void scale(float scalar); // uniform scale
+	void scale(float x, float y, float z); // scale on each axis
 };
 
 struct Matrix {
-	//float *elements;
 	float elements[16];
 	int rows, cols;
 	
 	Matrix(int rows, int cols);
-	Matrix& add(const Matrix& right);
 
 	Matrix& operator=(Matrix right);
 	Matrix& operator+=(const Matrix& right);
 	Matrix& operator-=(const Matrix& right);
 	Matrix& operator*=(const Matrix& right);
-	Matrix& operator*=(const Vector& right);
 	// operator==
 	
 	friend Matrix operator+(Matrix left, const Matrix& right);
@@ -53,7 +54,7 @@ struct Matrix {
 	friend Vector operator*(Matrix left, const Vector& right);
 
 	void rotate(float angle, float x, float y, float z);
-	void rotate(float angle, Vector* rotationAxis);
+	void rotate(float angle, Vector& rotationAxis);
 	void translate(float x, float y, float z);
 	void translate(Vector& v);
 	void transpose();

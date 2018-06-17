@@ -4,89 +4,67 @@
 Point::Point(float x, float y, float z) : x(x), y(y), z(z) {}
 
 Vector::Vector(float x, float y, float z) {
-	elements = new float[4];
+	elements[4];
 	elements[0] = x;
 	elements[1] = y;
 	elements[2] = z;
 	elements[3] = 1;
 } 
 
-Vector* Vector::operator+(Vector& v) {
-	Vector* result = new Vector(0, 0, 0);
-	result->elements[Coords::X] = this->elements[Coords::X] + v.elements[Coords::X];
-	result->elements[Coords::Y] = this->elements[Coords::Y] + v.elements[Coords::Y];
-	result->elements[Coords::Z] = this->elements[Coords::Z] + v.elements[Coords::Z];
-	return result;
+Vector operator+(Vector left, const Vector& right) {
+	left += right;
+	return left;
 }
 
-Vector* Vector::operator-(Vector& v) {
-	Vector* result = new Vector(0, 0, 0);
-	result->elements[Coords::X] = this->elements[Coords::X] - v.elements[Coords::X];
-	result->elements[Coords::Y] = this->elements[Coords::Y] - v.elements[Coords::Y];
-	result->elements[Coords::Z] = this->elements[Coords::Z] - v.elements[Coords::Z];
-	return result;
+Vector& Vector::operator+=(const Vector& right) {
+	this->elements[Coords::X] = this->elements[Coords::X] + right.elements[Coords::X];
+	this->elements[Coords::Y] = this->elements[Coords::Y] + right.elements[Coords::Y];
+	this->elements[Coords::Z] = this->elements[Coords::Z] + right.elements[Coords::Z];
+	return *this;
 }
 
-Vector* Vector::operator*(Vector& v) {
-	Vector* result = new Vector(0, 0, 0);
-	result->elements[Coords::X] = this->elements[Coords::Y] * v.elements[Coords::Z] - this->elements[Coords::Z] * v.elements[Coords::Y];
-	result->elements[Coords::Y] = -(this->elements[Coords::X] * v.elements[Coords::Z] - this->elements[Coords::Z] * v.elements[Coords::X]);
-	result->elements[Coords::Z] = this->elements[Coords::X] * v.elements[Coords::Y] - this->elements[Coords::Y] * v.elements[Coords::X];
-	return result;
+Vector operator-(Vector left, const Vector& right) {
+	left -= right;
+	return left;
 }
 
-Vector* Vector::operator*(float scalar) {
-	Vector* result = new Vector(0, 0, 0);
-	result->elements[Coords::X] = scalar * this->elements[Coords::X];
-	result->elements[Coords::Y] = scalar * this->elements[Coords::Y];
-	result->elements[Coords::Z] = scalar * this->elements[Coords::Z];
-	return result;
+Vector& Vector::operator-=(const Vector& right) {
+	this->elements[Coords::X] = this->elements[Coords::X] - right.elements[Coords::X];
+	this->elements[Coords::Y] = this->elements[Coords::Y] - right.elements[Coords::Y];
+	this->elements[Coords::Z] = this->elements[Coords::Z] - right.elements[Coords::Z];
+	return *this;
 }
 
-float Vector::dot(Vector& v) {
-	return this->elements[Coords::X] * v.elements[Coords::X] + this->elements[Coords::Y] * v.elements[Coords::Y] + this->elements[Coords::Z] * v.elements[Coords::Z];
+Vector& Vector::operator*=(const Vector& right) {
+	this->elements[Coords::X] = this->elements[Coords::Y] * right.elements[Coords::Z] - this->elements[Coords::Z] * right.elements[Coords::Y];
+	this->elements[Coords::Y] = -(this->elements[Coords::X] * right.elements[Coords::Z] - this->elements[Coords::Z] * right.elements[Coords::X]);
+	this->elements[Coords::Z] = this->elements[Coords::X] * right.elements[Coords::Y] - this->elements[Coords::Y] * right.elements[Coords::X];
+	return *this;
 }
 
-void Vector::rotate(float xy, float yz, float xz) {
-	xy = degreesToRadians(xy);
-	yz = degreesToRadians(yz);
-	xz = degreesToRadians(xz);
-
-	// XY rotation
-	elements[Coords::X] = elements[Coords::X] * cos(xy) - elements[Coords::Y] * sin(xy);
-	elements[Coords::Y] = elements[Coords::X] * sin(xy) + elements[Coords::Y] * cos(xy);
-
-	// YZ rotation
-	elements[Coords::Y] = elements[Coords::Y] * cos(yz) - elements[Coords::Z] * sin(yz);
-	elements[Coords::Z] = elements[Coords::Y] * sin(yz) + elements[Coords::Z] * cos(yz);
-
-	// XZ rotation
-	elements[Coords::X] = elements[Coords::X] * cos(xz) + elements[Coords::Z] * sin(xz);
-	elements[Coords::Z] = elements[Coords::X] * -sin(xz) + elements[Coords::Z] * cos(xz);
+float Vector::dot(Vector& right) {
+	return this->elements[Coords::X] * right.elements[Coords::X] + this->elements[Coords::Y] * right.elements[Coords::Y] + this->elements[Coords::Z] * right.elements[Coords::Z];
 }
 
-float Vector::magnitude(Vector* v) {
-	return sqrt(v->elements[Coords::X] * v->elements[Coords::X] + v->elements[Coords::Y] * v->elements[Coords::Y] + v->elements[Coords::Z] * v->elements[Coords::Z]);
+float Vector::magnitude() {
+	return sqrt(this->elements[Coords::X] * this->elements[Coords::X] + this->elements[Coords::Y] * this->elements[Coords::Y] + this->elements[Coords::Z] * this->elements[Coords::Z]);
 }
 
-Vector* Vector::normalize(Vector* v) {
-	return *v * (1.0f / Vector::magnitude(v));
+void Vector::normalize() {
+	this->scale(1.0f / this->magnitude());
 }
 
-// should I keep this here?? already can do this with matrices, them multiply vector by transformation matrices (advantage is that you can do multiple transformations at once)
-Vector* Vector::translate(float x, float y, float z) {
-	return nullptr;
-}
-
-Vector* Vector::translate(Vector& v) {
-	return nullptr;
+void Vector::scale(float scalar) {
+	elements[Coords::X] *= scalar;
+	elements[Coords::Y] *= scalar;
+	elements[Coords::Z] *= scalar;
 }
 
 Matrix::Matrix(int rows, int cols) : rows(rows), cols(cols) {
 	elements[rows * cols];
-	for (int i = 0; i < rows; i++) {
-		for (int j = 0; j < cols; j++) {
-			elements[i + j * cols] = 0;
+	for (int i = 0; i < cols; i++) {
+		for (int j = 0; j < rows; j++) {
+			elements[j + i * rows] = 0;
 		}
 	}
 	
@@ -112,9 +90,9 @@ Matrix operator+(Matrix left, const Matrix& right) {
 
 Matrix& Matrix::operator+=(const Matrix& right) {
 	if (this->rows == right.rows && this->cols == right.cols) {
-		for (int i = 0; i < this->rows; i++) {
-			for (int j = 0; j < this->cols; j++) {
-				this->elements[i + j * this->cols] = this->elements[i + j * this->cols] + right.elements[i + j * right.cols];
+		for (int i = 0; i < this->cols; i++) {
+			for (int j = 0; j < this->rows; j++) {
+				this->elements[j + i * this->rows] = this->elements[j + i * this->rows] + right.elements[j + i * right.rows];
 			}
 		}
 	} else {
@@ -124,109 +102,121 @@ Matrix& Matrix::operator+=(const Matrix& right) {
 	return *this;
 }
 
-
-
-
-Matrix* Matrix::operator-(Matrix& m) {
-	if (this->rows == m.rows && this->cols == m.cols) {
-		Matrix* result = new Matrix(this->rows, this->cols);
-		for (int i = 0; i < this->rows; i++) {
-			for (int j = 0; j < this->cols; j++) {
-				result->elements[i + j * result->cols] = this->elements[i + j * this->cols] - m.elements[i + j * m.cols];
-			}
-		}
-		return result;
-	}
-	else {
-		std::cout << "Rows and columns must be equal to subtract matrices.";
-		std::cout << std::endl;
-		return nullptr;
-	}
+Matrix operator-(Matrix left, const Matrix& right) {
+	left -= right;
+	return left;
 }
 
-Matrix* Matrix::operator*(Matrix& m) {
-	if (this->cols == m.rows) {
-		Matrix* result = new Matrix(this->rows, m.cols);
-		result->zero();
-		for (int i = 0; i < this->rows; i++) {
-			for (int j = 0; j < m.cols; j++) {
-				for (int k = 0; k < m.rows; k++) {
-					result->elements[i + j * result->cols] += m.elements[k + j * m.cols] * this->elements[i + k * this->cols];
+Matrix& Matrix::operator-=(const Matrix& right) {
+	if (this->rows == right.rows && this->cols == right.cols) {
+		for (int i = 0; i < this->cols; i++) {
+			for (int j = 0; j < this->rows; j++) {
+				this->elements[j + i * this->rows] = this->elements[j + i * this->rows] - right.elements[j + i * right.rows];
+			}
+		}
+	} else {
+		std::cout << "Rows and columns must be equal to subtract matrices.";
+		std::cout << std::endl;
+	}
+	return *this;
+}
+
+Matrix operator*(Matrix left, const Matrix& right) {
+	left *= right;
+	return left;
+}
+
+Matrix& Matrix::operator*=(const Matrix& right) {
+	Matrix result(this->rows, right.cols);
+	result.zero();
+	if (this->cols == right.rows) {
+		for (int i = 0; i < right.cols; i++) {
+			for (int j = 0; j < this->rows; j++) {
+				for (int k = 0; k < right.rows; k++) {
+					result.elements[j + i * this->rows] += this->elements[j + k * this->rows] * right.elements[i + k * right.cols];
 				}
 			}
 		}
-		return result;
-	}
-	else {
+
+		std::swap(this->elements, result.elements);
+		this->cols = right.cols;
+	} else {
 		std::cout << "Columns must be equal to rows of other matrix to multiply matrices.";
 		std::cout << std::endl;
-		return nullptr;
 	}
+	return *this;
 }
 
-Vector* Matrix::operator*(Vector& v) {
-	if (rows == 4 && cols == 4) {
-		Vector* result = new Vector(0, 0, 0);
+Vector operator*(Matrix left, const Vector& right) {
+	Vector result(0, 0, 0);
+	if (left.rows == 4 && left.cols == 4) {
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 4; j++) {
-				result->elements[i] += v.elements[j] * this->elements[i + j * cols];
+				result.elements[i] += right.elements[j] * left.elements[i + j * left.cols];
 			}
 		}
-		return result;
-	}
-	else {
+	} else {
 		std::cout << "Must multiply vector by a 4x4 matrix.";
 		std::cout << std::endl;
-		return nullptr;
-	}
-}
-
-Matrix* Matrix::operator*(float scalar) {
-	Matrix* result = new Matrix(this->rows, this->cols);
-	for (int i = 0; i < this->rows; i++) {
-		for (int j = 0; j < this->cols; j++) {
-			result->elements[i + j * cols] = scalar * this->elements[i + j * cols];
-		}
 	}
 	return result;
 }
 
-void Matrix::rotate(float angle, Vector* rotationAxis) {
+void Matrix::rotate(float angle, float x, float y, float z) {
+	Vector rotationAxis(x, y, z);
+	Matrix::rotate(angle, rotationAxis);
+}
+
+void Matrix::rotate(float angle, Vector& rotationAxis) {
 	if (this->rows == 4 && this->cols == 4) {
 		angle = degreesToRadians(angle);
-		Matrix* result = new Matrix(4, 4);
+		Matrix result(4, 4);
 		// https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
-		rotationAxis = Vector::normalize(rotationAxis);
+		rotationAxis.normalize();
 
 		// Rotation matrix
-		Matrix* u = new Matrix(3, 1);
+		Matrix u(3, 1);
 		for (int i = 0; i < 3; i++) {
-			u->elements[i] = rotationAxis->elements[i];
+			u.elements[i] = rotationAxis.elements[i];
 		}
-		
-		Matrix* tensorProd = u;
-		u->transpose();
-		tensorProd = *tensorProd * *u;
+
+		Matrix tensorProd(3, 3);
+		Matrix uOrig(3, 1);
+		uOrig = u;
+		u.transpose();
+		for (int i = 0; i < 3; i++) {
+			std::cout << u.elements[i] << " ";
+		}
+		tensorProd = uOrig * u;
 		
 		// Yeah, I hard coded this bc I don't know how it's derived
-		Matrix* crossProductMat = new Matrix(3, 3);
-		crossProductMat->elements[1] = rotationAxis->elements[Coords::Z];
-		crossProductMat->elements[2] = -rotationAxis->elements[Coords::Y];
-		crossProductMat->elements[3] = -rotationAxis->elements[Coords::Z];
-		crossProductMat->elements[5] = rotationAxis->elements[Coords::X];
-		crossProductMat->elements[6] = rotationAxis->elements[Coords::Y];
-		crossProductMat->elements[7] = -rotationAxis->elements[Coords::X];
+		Matrix crossProductMat(3, 3);
+		crossProductMat.zero();
+		crossProductMat.elements[1] = rotationAxis.elements[Coords::Z];
+		crossProductMat.elements[2] = -rotationAxis.elements[Coords::Y];
+		crossProductMat.elements[3] = -rotationAxis.elements[Coords::Z];
+		crossProductMat.elements[5] = rotationAxis.elements[Coords::X];
+		crossProductMat.elements[6] = rotationAxis.elements[Coords::Y];
+		crossProductMat.elements[7] = -rotationAxis.elements[Coords::X];
 		
-		Matrix* rotation = new Matrix(3, 3);
-		//rotation = *(*rotation * (float) cos(angle)) + *(*crossProductMat * (float) sin(angle));
-		//rotation = *rotation + *(*tensorProd * (1.0f - (float) cos(angle)));
-
+		Matrix rotation(3, 3);
+		rotation.scale((float)cos(angle));
+		crossProductMat.scale((float)sin(angle));
+		for (int i = 0; i < 9; i++) {
+			std::cout << tensorProd.elements[i] << " ";
+		}
+		tensorProd.scale(1.0f - (float)cos(angle));
+		
+		rotation = rotation + crossProductMat + tensorProd;
+		
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				result->elements[i + j * 4] = rotation->elements[i + j * 3];
+				result.elements[j + i * 4] = rotation.elements[j + i * 3];
 			}
 		}
-		//this->elements = (*result * *this)->elements;
+		std::cout << std::endl;
+		result *= *this;
+		std::swap(this->elements, result.elements);
 	}
 	else {
 		std::cout << "Given matrix must be 4x4 to turn into rotation matrix.";
@@ -236,11 +226,12 @@ void Matrix::rotate(float angle, Vector* rotationAxis) {
 
 void Matrix::translate(float x, float y, float z) {
 	if (this->rows == 4 && this->cols == 4) {
-		Matrix* result = new Matrix(4, 4);
-		result->elements[12] = x;
-		result->elements[13] = y;
-		result->elements[14] = z;
-		//this->elements = (*result * *this)->elements;
+		Matrix result(4, 4);
+		result.elements[12] = x;
+		result.elements[13] = y;
+		result.elements[14] = z;
+		result *= *this;
+		std::swap(this->elements, result.elements);
 	}
 	else {
 		std::cout << "Given matrix must be 4x4 to turn into translation matrix.";
@@ -250,11 +241,12 @@ void Matrix::translate(float x, float y, float z) {
 
 void Matrix::translate(Vector& v) {
 	if (this->rows == 4 && this->cols == 4) {
-		Matrix* result = new Matrix(4, 4);
+		Matrix result(4, 4);
 		for (int i = 0; i < 3; i++) {
-			result->elements[i + 3 * 4] = v.elements[i];
+			result.elements[i + 3 * 4] = v.elements[i];
 		}
-		//this->elements = (*result * *this)->elements;
+		result *= *this;
+		std::swap(this->elements, result.elements);
 	}
 	else {
 		std::cout << "Given matrix must be 4x4 to turn into translation matrix.";
@@ -262,16 +254,19 @@ void Matrix::translate(Vector& v) {
 	}
 }
 
+/*
+	IF THERE IS EVER A PROBLEM IT COULD BE THIS FUNCTION
+*/
 void Matrix::transpose() {
-	Matrix* result = new Matrix(this->cols, this->rows);
-	for (int i = 0; i < this->rows; i++) {
-		for (int j = 0; j < this->cols; j++) {
-			result->elements[j + i * this->rows] = this->elements[i + j * this->cols];
+	Matrix result(this->cols, this->rows);
+	for (int i = 0; i < result.cols; i++) {
+		for (int j = 0; j < result.rows; j++) {
+			result.elements[i + j * result.rows] = this->elements[j + i * this->cols];
 		}
 	}
-	//this->elements = result->elements;
-	this->rows = result->rows;
-	this->cols = result->cols;
+	std::swap(this->elements, result.elements);
+	this->rows = result.rows;
+	this->cols = result.cols;
 }
 
 void Matrix::identity() {
@@ -287,10 +282,16 @@ void Matrix::identity() {
 }
 
 void Matrix::zero() {
-	for (int i = 0; i < this->rows; i++) {
-		for (int j = 0; j < this->cols; j++) {
-			this->elements[i + j * this->cols] = 0;
+	for (int i = 0; i < this->cols; i++) {
+		for (int j = 0; j < this->rows; j++) {
+			this->elements[i + j * this->rows] = 0;
 		}
+	}
+}
+
+void Matrix::scale(float scalar) {
+	for (int i = 0; i < rows * cols; i++) {
+		elements[i] *= scalar;
 	}
 }
 
