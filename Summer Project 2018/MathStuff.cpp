@@ -98,13 +98,6 @@ Matrix::Matrix(int rows, int cols) : rows(rows), cols(cols) {
 	}
 }
 
-Matrix& Matrix::add(const Matrix& right) {
-	for (int i = 0; i < rows * cols; i++) {
-		elements[i] = elements[i] + right.elements[i];
-	}
-	return *this;
-}
-
 Matrix& Matrix::operator=(Matrix right) {
 	std::swap(this->elements, right.elements);
 	std::swap(this->rows, right.rows);
@@ -113,7 +106,8 @@ Matrix& Matrix::operator=(Matrix right) {
 }
 
 Matrix operator+(Matrix left, const Matrix& right) {
-	return left.add(right);
+	left += right;
+	return left;
 }
 
 Matrix& Matrix::operator+=(const Matrix& right) {
