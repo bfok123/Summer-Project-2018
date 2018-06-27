@@ -87,19 +87,19 @@ void Shader::setUniform1f(const std::string &name, const float value) {
 //CHANGE EVERYTHING TO GLFLOAT FOR CONSISTENCY?
 void Shader::setUniform2f(const std::string &name, const Vector& vector) {
 	glUniform2f(glGetUniformLocation(id, name.c_str()),
-				vector[Coordinates::X], vector[Coordinates::Y]);
+				vector.elements[Coordinates::X], vector.elements[Coordinates::Y]);
 }
 
 void Shader::setUniform3f(const std::string &name, const Vector& vector) {
 	glUniform3f(glGetUniformLocation(id, name.c_str()),
-				vector[Coordinates::X], vector[Coordinates::Y],
-				vector[Coordindates::Z]);
+				vector.elements[Coordinates::X], vector.elements[Coordinates::Y],
+				vector.elements[Coordinates::Z]);
 }
 
 void Shader::setUniform4f(const std::string &name, const Vector& vector) {
 	glUniform4f(glGetUniformLocation(id, name.c_str()),
-				vector[Coordinates::X], vector[Coordinates::Y],
-				vector[Coordinates::Z], vector[Coordinates::W]);
+				vector.elements[Coordinates::X], vector.elements[Coordinates::Y],
+				vector.elements[Coordinates::Z], vector.elements[Coordinates::W]);
 }
 
 void Shader::setUniformMatrix(const std::string &name, const Matrix& matrix) {

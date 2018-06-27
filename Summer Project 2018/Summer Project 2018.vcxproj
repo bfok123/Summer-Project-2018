@@ -125,14 +125,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="MathStuff.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Vector.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AlternateMain.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MathStuff.cpp" />
     <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="Vector.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>

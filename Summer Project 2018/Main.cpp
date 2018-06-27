@@ -1,4 +1,4 @@
-#include "MathStuff.h"
+﻿#include "MathStuff.h"
 #include "GLFW\glfw3.h"
 #include <iostream>
 #include "Window.h"
@@ -44,6 +44,8 @@ void init(int windowWidth, int windowHeight, int windowScale, const char* title)
 	//^^^ IDK HOW MUCH OF THIS IS RELEVANT FOR 3D
 	
 	glfwSetWindowSize(Window::window, windowWidth * windowScale, windowHeight * windowScale);
+	
+	rotate.identity();
 	
 	rotate.rotate(1.0f, 0.0f, 0.2f, 0.0f);
 	rotate.translate(0.001f, 0.0f, 0.0f);
@@ -99,32 +101,32 @@ void render() {
 
 
 	glColor3f(0.5f, 0.75f, 0.5f);
-	glVertex3f(fl1.elements[Coords::X], fl1.elements[Coords::Y], fl1.elements[Coords::Z]);
+	glVertex3f(fl1.elements[Coordinates::X], fl1.elements[Coordinates::Y], fl1.elements[Coordinates::Z]);
 	glColor3f(0.23f, 1.0f, 0.29f);
-	glVertex3f(fl2.elements[Coords::X], fl2.elements[Coords::Y], fl2.elements[Coords::Z]);
+	glVertex3f(fl2.elements[Coordinates::X], fl2.elements[Coordinates::Y], fl2.elements[Coordinates::Z]);
 	glColor3f(0.82f, 0.72f, 0.38f);
-	glVertex3f(fl3.elements[Coords::X], fl3.elements[Coords::Y], fl3.elements[Coords::Z]);
+	glVertex3f(fl3.elements[Coordinates::X], fl3.elements[Coordinates::Y], fl3.elements[Coordinates::Z]);
 
 	glColor3f(0.3f, 0.25f, 0.73f);
-	glVertex3f(fr1.elements[Coords::X], fr1.elements[Coords::Y], fr1.elements[Coords::Z]);
+	glVertex3f(fr1.elements[Coordinates::X], fr1.elements[Coordinates::Y], fr1.elements[Coordinates::Z]);
 	glColor3f(0.73f, 1.0f, 0.0f);
-	glVertex3f(fr2.elements[Coords::X], fr2.elements[Coords::Y], fr2.elements[Coords::Z]);
+	glVertex3f(fr2.elements[Coordinates::X], fr2.elements[Coordinates::Y], fr2.elements[Coordinates::Z]);
 	glColor3f(0.82f, 0.72f, 0.38f);
-	glVertex3f(fr3.elements[Coords::X], fr3.elements[Coords::Y], fr3.elements[Coords::Z]);
+	glVertex3f(fr3.elements[Coordinates::X], fr3.elements[Coordinates::Y], fr3.elements[Coordinates::Z]);
 
 	glColor3f(0.64f, 0.234f, 0.54f);
-	glVertex3f(bl1.elements[Coords::X], bl1.elements[Coords::Y], bl1.elements[Coords::Z]);
+	glVertex3f(bl1.elements[Coordinates::X], bl1.elements[Coordinates::Y], bl1.elements[Coordinates::Z]);
 	glColor3f(0.13f, 0.0f, 0.83f);
-	glVertex3f(bl2.elements[Coords::X], bl2.elements[Coords::Y], bl2.elements[Coords::Z]);
+	glVertex3f(bl2.elements[Coordinates::X], bl2.elements[Coordinates::Y], bl2.elements[Coordinates::Z]);
 	glColor3f(0.24f, 0.63f, 0.72f);
-	glVertex3f(bl3.elements[Coords::X], bl3.elements[Coords::Y], bl3.elements[Coords::Z]);
+	glVertex3f(bl3.elements[Coordinates::X], bl3.elements[Coordinates::Y], bl3.elements[Coordinates::Z]);
 
 	glColor3f(0.23f, 0.5f, 0.92f);
-	glVertex3f(br1.elements[Coords::X], br1.elements[Coords::Y], br1.elements[Coords::Z]);
+	glVertex3f(br1.elements[Coordinates::X], br1.elements[Coordinates::Y], br1.elements[Coordinates::Z]);
 	glColor3f(0.723f, 0.63f, 0.18f);
-	glVertex3f(br2.elements[Coords::X], br2.elements[Coords::Y], br2.elements[Coords::Z]);
+	glVertex3f(br2.elements[Coordinates::X], br2.elements[Coordinates::Y], br2.elements[Coordinates::Z]);
 	glColor3f(0.72f, 0.36f, 0.62f);
-	glVertex3f(br3.elements[Coords::X], br3.elements[Coords::Y], br3.elements[Coords::Z]);
+	glVertex3f(br3.elements[Coordinates::X], br3.elements[Coordinates::Y], br3.elements[Coordinates::Z]);
 
 	glEnd();
 
@@ -132,14 +134,26 @@ void render() {
 }
 
 void loop() {
+	unsigned int fpsCounter = 0;
 	double time = glfwGetTime();
+	double previousTime = glfwGetTime();
+	double interval = 1.0 / 10.0;
+	double difference = 0.0;
 	while (running) {
-		update();
-		render();/*
+		double currentTime = glfwGetTime();
+		difference += (currentTime - previousTime) / interval;
+		previousTime = currentTime;
+		while (difference >= 1) {
+			update();
+			difference--;
+		}
+		render();
+		fpsCounter++;
 		if (glfwGetTime() - time >= 1) {
-			render();
-			time += glfwGetTime();
-		}*/
+			time += 1.0;
+			//Window::setTitle((Window::title + std::string(" | ") + std::to_string(fpsCounter) + " FPS").c_str());
+			fpsCounter = 0;
+		}
 	}
 }
 

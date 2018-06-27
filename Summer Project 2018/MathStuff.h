@@ -3,8 +3,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-enum Coords {
-	X, Y, Z
+enum Coordinates {
+	X, Y, Z, W
 };
 
 inline static float degreesToRadians(float deg) { return deg * (M_PI / 180.0); }
@@ -62,6 +62,7 @@ struct Matrix {
 	void zero();
 	void scale(float scalar); // uniform scale
 	void scale(float x, float y, float z); // scale on each axis
+	void orthodontist(float left, float right, float top, float bottom, float near, float far);
 };
 
 

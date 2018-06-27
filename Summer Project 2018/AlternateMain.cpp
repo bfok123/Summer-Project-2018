@@ -1,17 +1,16 @@
 #include "GL\glew.h"
 #include "GLFW\glfw3.h"
 #include <iostream>
-#include "Vector.h"
 #include "Window.h"
 #include "Shader.h"
 
-bool running;
+//bool running;
 
-const unsigned int WIDTH = 800;
+/*const unsigned int WIDTH = 800;
 const unsigned int HEIGHT = 450;
 const unsigned int SCALE = 3;
 const char* TITLE = "boop";
-
+/*
 bool init() {
 
 	//GLFW
@@ -121,7 +120,7 @@ void update() {
 void render() {
 	/*
 	We need to learn how to render vertices
-	*/
+	
 	glClearColor(0.5f, 0.5f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	
@@ -152,4 +151,4 @@ int main() {
 		return 0;
 	}
 	loop();
-}
+}*/
