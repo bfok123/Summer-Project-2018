@@ -275,7 +275,54 @@ void Matrix::scale(float scalar) {
 	}
 }
 
-//void Matrix::
+void Matrix::scale(float x, float y, float z) {
+	Matrix scaleMat(4, 4);
+	scaleMat.identity();
+	scaleMat.elements[0] = x;
+	scaleMat.elements[5] = y;
+	scaleMat.elements[10] = z;
+	Matrix result = *this;
+	result *= scaleMat;
+	std::swap(this->elements, result.elements);
+}
+
+// should i just manually input the elements to make this more efficient?????
+void Matrix::ortho(float left, float right, float top, float bottom, float near, float far) {
+	if (this->rows == 4 && this->cols == 4) {
+		Matrix scale(4, 4);
+		scale.identity();
+		scale.scale(2.0f / (right - left), 2.0f / (top - bottom), 2.0f / (far - near));
+		Matrix translate(4, 4);
+		translate.identity();
+		translate.translate(-((left + right) / 2.0f), -((top + bottom) / 2.0f), -((far + near) / 2.0f));
+		translate.elements[10] = -1;
+		Matrix result(4, 4);
+		result = scale * translate;
+		for (int i = 0; i < 16; i++) {
+			std::cout << result.elements[i] << " ";
+		}
+		std::swap(this->elements, result.elements);
+	} else {
+		std::cout << "Given matrix must be 4x4 to turn into orthographic projection matrix.";
+		std::cout << std::endl;
+	}
+}
+
+void Matrix::perspective(float fieldOfView, float aspect, float near, float far) {
+	if (this->rows == 4 && this->cols == 4) {
+		Matrix result(4, 4);
+		float tanHalfFoV = tan(fieldOfView / 2.0);
+		result.elements[0] = 1.0f / (aspect * tanHalfFoV);
+		result.elements[5] = 1.0f / tanHalfFoV;
+		result.elements[10] = -(far + near) / (far - near);
+		result.elements[11] = -1;
+		result.elements[14] = -(2.0f * far * near) / (far - near);
+		std::swap(this->elements, result.elements);
+	} else {
+		std::cout << "Given matrix must be 4x4 to turn into (symmetric) perspective projection matrix.";
+		std::cout << std::endl;
+	}
+}
 
 
 

@@ -62,7 +62,8 @@ struct Matrix {
 	void zero();
 	void scale(float scalar); // uniform scale
 	void scale(float x, float y, float z); // scale on each axis
-	void orthodontist(float left, float right, float top, float bottom, float near, float far);
+	void ortho(float left, float right, float top, float bottom, float near, float far);
+	void perspective(float fieldOfView, float aspect, float near, float far);
 };
 
 

@@ -45,13 +45,6 @@ void init(int windowWidth, int windowHeight, int windowScale, const char* title)
 	
 	glfwSetWindowSize(Window::window, windowWidth * windowScale, windowHeight * windowScale);
 	
-	rotate.identity();
-	
-	rotate.rotate(1.0f, 0.0f, 0.2f, 0.0f);
-	rotate.translate(0.001f, 0.0f, 0.0f);
-	for (int i = 0; i < 16; i++) {
-		std::cout << rotate.elements[i] << " ";
-	}
 	running = true;
 }
 
