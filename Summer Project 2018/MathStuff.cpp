@@ -166,8 +166,24 @@ void Matrix::rotate(float angle, float x, float y, float z) {
 }
 
 void Matrix::rotate(float angle, Vector& rotationAxis) {
+	
 	if (this->rows == 4 && this->cols == 4) {
 		angle = degreesToRadians(angle);
+		float x = rotationAxis.elements[Coordinates::X];
+		float y = rotationAxis.elements[Coordinates::Y];
+		float z = rotationAxis.elements[Coordinates::Z];
+		Matrix result(4, 4);
+		result.elements[0] = cos(angle) + (x * x) * (1 - cos(angle));
+		result.elements[1] = y * x * (1 - cos(angle)) + (z * sin(angle));
+		result.elements[2] = z * x * (1 - cos(angle)) - (y * sin(angle));
+		result.elements[4] = x * y * (1 - cos(angle)) - (z * sin(angle));
+		result.elements[5] = cos(angle) + (y * y) * (1 - cos(angle));
+		result.elements[6] = z * y * (1 - cos(angle)) + (x * sin(angle));
+		result.elements[8] = x * z * (1 - cos(angle)) + (y * sin(angle));
+		result.elements[9] = y * z * (1 - cos(angle)) - (x * sin(angle));
+		result.elements[10] = cos(angle) + z * z * (1 - cos(angle));
+		result.elements[15] = 1;
+		/*
 		Matrix result(4, 4);
 		result.identity();
 		rotationAxis.normalize();
@@ -204,7 +220,7 @@ void Matrix::rotate(float angle, Vector& rotationAxis) {
 			for (int j = 0; j < 3; j++) {
 				result.elements[j + i * 4] = rotation.elements[j + i * 3];
 			}
-		}
+		}*/
 		result *= *this;
 		std::swap(this->elements, result.elements);
 	}
@@ -310,19 +326,22 @@ void Matrix::ortho(float left, float right, float top, float bottom, float near,
 
 void Matrix::perspective(float fieldOfView, float aspect, float near, float far) {
 	if (this->rows == 4 && this->cols == 4) {
+		fieldOfView = degreesToRadians(fieldOfView);
 		Matrix result(4, 4);
-		float tanHalfFoV = tan(fieldOfView / 2.0);
-		result.elements[0] = 1.0f / (aspect * tanHalfFoV);
-		result.elements[5] = 1.0f / tanHalfFoV;
-		result.elements[10] = -(far + near) / (far - near);
+		float f = 1.0f / tanf(fieldOfView * M_PI / 360.0f);
+		result.elements[0] = f / aspect;
+		result.elements[5] = f;
+		result.elements[10] = (far + near) / (near - far);
 		result.elements[11] = -1;
-		result.elements[14] = -(2.0f * far * near) / (far - near);
+		result.elements[14] = (2.0f * far * near) / (near - far);
 		std::swap(this->elements, result.elements);
 	} else {
 		std::cout << "Given matrix must be 4x4 to turn into (symmetric) perspective projection matrix.";
 		std::cout << std::endl;
 	}
 }
+
+void 
 
 
 

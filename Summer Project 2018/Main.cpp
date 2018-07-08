@@ -5,6 +5,23 @@
 
 bool running;
 Matrix rotate(4, 4);
+/*
+Vector fl1(0.0f, 0.0f, 0.0f);
+Vector fl2(0.0f, -0.5f, 0.5f);
+Vector fl3(-0.5f, -0.5f, 0.0f);
+Vector fr1(0.0f, 0.0f, 0.0f);
+Vector fr2(0.0f, -0.5f, 0.5f);
+Vector fr3(0.5f, -0.5f, 0.0f);
+Vector bl1(0.0f, 0.0f, 0.0f);
+Vector bl2(-0.5f, -0.5f, 0.0f);
+Vector bl3(0.0f, -0.5f, -0.5f);
+Vector br1(0.0f, 0.0f, 0.0f);
+Vector br2(0.5f, -0.5f, 0.0f);
+Vector br3(0.0f, -0.5f, -0.5f);*/
+Vector tl(-0.5, 0.5, 0);
+Vector tr(0.5, 0.5, 0);
+Vector bl(-0.5, -0.5, 0);
+int width, height;
 
 void init(int windowWidth, int windowHeight, int windowScale, const char* title) {
 	glfwInit();
@@ -15,7 +32,7 @@ void init(int windowWidth, int windowHeight, int windowScale, const char* title)
 
 	//GLFW STUFF
 	glfwMakeContextCurrent(Window::window);
-	int width, height;
+	
 	glfwGetFramebufferSize(Window::window, &width, &height);
 	glfwSwapInterval(0); //V-Sync stuff
 	const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
@@ -45,25 +62,44 @@ void init(int windowWidth, int windowHeight, int windowScale, const char* title)
 	
 	glfwSetWindowSize(Window::window, windowWidth * windowScale, windowHeight * windowScale);
 	
-	running = true;
-}
-
-Vector fl1(0.0f, 0.0f, 0.0f);
-Vector fl2(0.0f, -0.5f, 0.5f);
-Vector fl3(-0.5f, -0.5f, 0.0f);
-Vector fr1(0.0f, 0.0f, 0.0f);
-Vector fr2(0.0f, -0.5f, 0.5f);
-Vector fr3(0.5f, -0.5f, 0.0f);
-Vector bl1(0.0f, 0.0f, 0.0f);
-Vector bl2(-0.5f, -0.5f, 0.0f);
-Vector bl3(0.0f, -0.5f, -0.5f);
-Vector br1(0.0f, 0.0f, 0.0f);
-Vector br2(0.5f, -0.5f, 0.0f);
-Vector br3(0.0f, -0.5f, -0.5f);
-
-void update() {
-	running = !glfwWindowShouldClose(Window::window);
-	
+	rotate.identity();
+	Matrix model(4, 4);
+	//model.identity();
+	//model.rotate(30.0f, 1.0f, 1.0f, 1.0f);
+	Matrix view(4, 4);
+	//view.identity();
+	//view.translate(0.0f, 0.0f, -14.0f);
+	Matrix projection(4, 4);
+	//projection.perspective(90.0f, width / height, 0.1f, 100.0f);
+	model.elements[0] = 0.9107;
+	model.elements[1] = 0.3333;
+	model.elements[2] = -0.2440;
+	model.elements[3] = 0;
+	model.elements[4] = -0.2440;
+	model.elements[5] = 0.9107;
+	model.elements[6] = 0.3333;
+	model.elements[7] = 0;
+	model.elements[8] = 0.3333;
+	model.elements[9] = -0.2440;
+	model.elements[10] = 0.9107;
+	model.elements[11] = 0;
+	model.elements[12] = 0;
+	model.elements[13] = 0;
+	model.elements[14] = 0;
+	model.elements[15] = 1;
+	view.identity();
+	view.elements[14] = -14;
+	projection.zero();
+	projection.elements[0] = 1.25;
+	projection.elements[5] = 1.667;
+	projection.elements[10] = -1.1333;
+	projection.elements[11] = -1;
+	projection.elements[14] = -10.667;
+	rotate = projection * view * model;
+	for (int i = 0; i < 16; i++) {
+		std::cout << rotate.elements[i] << " ";
+	}
+	/*
 	fl1 = rotate * fl1;
 	fl2 = rotate * fl2;
 	fl3 = rotate * fl3;
@@ -76,6 +112,17 @@ void update() {
 	br1 = rotate * br1;
 	br2 = rotate * br2;
 	br3 = rotate * br3;
+	*/
+	
+	running = true;
+}
+
+void update() {
+	running = !glfwWindowShouldClose(Window::window);
+	
+	tl = rotate * tl;
+	tr = rotate * tr;
+	bl = rotate * bl;
 }
 
 void render() {
@@ -92,7 +139,14 @@ void render() {
 
 	glBegin(GL_TRIANGLES);
 
+	glColor3f(0.5f, 0.32f, 0.63f);
+	glVertex3f(tl.elements[Coordinates::X], tl.elements[Coordinates::Y], tl.elements[Coordinates::Z]);
+	glColor3f(0.26f, 0.46f, 0.92f);
+	glVertex3f(tr.elements[Coordinates::X], tr.elements[Coordinates::Y], tr.elements[Coordinates::Z]);
+	glColor3f(0.37f, 0.74f, 0.17f);
+	glVertex3f(bl.elements[Coordinates::X], bl.elements[Coordinates::Y], bl.elements[Coordinates::Z]);
 
+	/*
 	glColor3f(0.5f, 0.75f, 0.5f);
 	glVertex3f(fl1.elements[Coordinates::X], fl1.elements[Coordinates::Y], fl1.elements[Coordinates::Z]);
 	glColor3f(0.23f, 1.0f, 0.29f);
@@ -120,7 +174,7 @@ void render() {
 	glVertex3f(br2.elements[Coordinates::X], br2.elements[Coordinates::Y], br2.elements[Coordinates::Z]);
 	glColor3f(0.72f, 0.36f, 0.62f);
 	glVertex3f(br3.elements[Coordinates::X], br3.elements[Coordinates::Y], br3.elements[Coordinates::Z]);
-
+	*/
 	glEnd();
 
 	glfwSwapBuffers(Window::window);
@@ -130,7 +184,7 @@ void loop() {
 	unsigned int fpsCounter = 0;
 	double time = glfwGetTime();
 	double previousTime = glfwGetTime();
-	double interval = 1.0 / 10.0;
+	double interval = 1.0 / 1.0;
 	double difference = 0.0;
 	while (running) {
 		double currentTime = glfwGetTime();
