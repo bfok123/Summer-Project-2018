@@ -2,7 +2,8 @@
 
 Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath) {
 	//FILE READING
-	char* vertexCode, * fragmentCode;
+	// char* vertexCode, * fragmentCode;
+	std::string vertexCode, fragmentCode; // unfiltered code
 	std::ifstream vertexFile, fragmentFile;
 	vertexFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 	fragmentFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -18,13 +19,21 @@ Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath) {
 		vertexFile.close();
 		fragmentFile.close();
 		//convert streams into strings
-		vertexCode = new char[std::strlen(vertexStream.str().c_str()) + 1];
-		std::strcpy(vertexCode, vertexStream.str().c_str()); //_CRT_SECURE_NO_WARNINGS
-		fragmentCode = new char[std::strlen(fragmentStream.str().c_str()) + 1];
-		std::strcpy(fragmentCode, fragmentStream.str().c_str());
+		// vertexCode = new char[std::strlen(vertexStream.str().c_str()) + 1];
+		// std::strcpy(vertexCode, vertexStream.str().c_str()); //_CRT_SECURE_NO_WARNINGS
+		// fragmentCode = new char[std::strlen(fragmentStream.str().c_str()) + 1];
+		// std::strcpy(fragmentCode, fragmentStream.str().c_str());
+		vertexCode = vertexStream.str();
+		fragmentCode = fragmentStream.str();
+
+		std::cout << vertexCode << std::endl;
+		std::cout << fragmentCode << std::endl;
 	} catch (std::ifstream::failure e) {
 		std::cout << "Failed to read shader files. :(" << std::endl;
 	}
+
+	const char* vertexShaderCode = vertexCode.c_str();
+	const char* fragmentShaderCode = fragmentCode.c_str();
 
 	//COMPILATION
 	unsigned int vertexShader, fragmentShader;
@@ -32,7 +41,7 @@ Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath) {
 	char infoLog[512];
 	//Vertex Compilation
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexCode, NULL);
+	glShaderSource(vertexShader, 1, &vertexShaderCode, NULL);// &vertexCode, NULL);
 	glCompileShader(vertexShader);
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
 	if (!success) {
@@ -42,7 +51,7 @@ Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath) {
 	}
 	//Fragment Compilation
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentCode, NULL);
+	glShaderSource(fragmentShader, 1, &fragmentShaderCode, NULL);// &fragmentCode, NULL);
 	glCompileShader(fragmentShader);
 	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
 	if (!success) {
@@ -102,6 +111,6 @@ void Shader::setUniform4f(const std::string &name, const Vector& vector) {
 				vector.elements[Coordinates::Z], vector.elements[Coordinates::W]);
 }
 
-void Shader::setUniformMatrix(const std::string &name, const Matrix& matrix) {
+void Shader::setUniformMatrix4(const std::string &name, const Matrix& matrix) {
 	glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, matrix.elements);
 }

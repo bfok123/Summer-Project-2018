@@ -21,7 +21,7 @@ public:
 	void setUniform2f(const std::string &name, const Vector& vector);
 	void setUniform3f(const std::string &name, const Vector& vector);
 	void setUniform4f(const std::string &name, const Vector& vector);
-	void setUniformMatrix(const std::string &name, const Matrix& vector);
+	void setUniformMatrix4(const std::string &name, const Matrix& vector);
 };
 
 #endif

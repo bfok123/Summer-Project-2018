@@ -176,12 +176,15 @@ void Matrix::rotate(float angle, Vector& rotationAxis) {
 		result.elements[0] = cos(angle) + (x * x) * (1 - cos(angle));
 		result.elements[1] = y * x * (1 - cos(angle)) + (z * sin(angle));
 		result.elements[2] = z * x * (1 - cos(angle)) - (y * sin(angle));
+
 		result.elements[4] = x * y * (1 - cos(angle)) - (z * sin(angle));
 		result.elements[5] = cos(angle) + (y * y) * (1 - cos(angle));
 		result.elements[6] = z * y * (1 - cos(angle)) + (x * sin(angle));
+
 		result.elements[8] = x * z * (1 - cos(angle)) + (y * sin(angle));
 		result.elements[9] = y * z * (1 - cos(angle)) - (x * sin(angle));
 		result.elements[10] = cos(angle) + z * z * (1 - cos(angle));
+
 		result.elements[15] = 1;
 		/*
 		Matrix result(4, 4);
@@ -326,13 +329,16 @@ void Matrix::ortho(float left, float right, float top, float bottom, float near,
 
 void Matrix::perspective(float fieldOfView, float aspect, float near, float far) {
 	if (this->rows == 4 && this->cols == 4) {
-		fieldOfView = degreesToRadians(fieldOfView);
+		// fieldOfView = degreesToRadians(fieldOfView);
 		Matrix result(4, 4);
-		float f = 1.0f / tanf(fieldOfView * M_PI / 360.0f);
+		// result.identity();
+		// float f = 1.0f / tanf(fieldOfView * M_PI / 360.0f);
+		float f = 1.0f / tanf(fieldOfView / 2.0f);
+
 		result.elements[0] = f / aspect;
 		result.elements[5] = f;
 		result.elements[10] = (far + near) / (near - far);
-		result.elements[11] = -1;
+		result.elements[11] = -1.0f;
 		result.elements[14] = (2.0f * far * near) / (near - far);
 		std::swap(this->elements, result.elements);
 	} else {
@@ -341,7 +347,7 @@ void Matrix::perspective(float fieldOfView, float aspect, float near, float far)
 	}
 }
 
-void 
+//void 
 
 
 
