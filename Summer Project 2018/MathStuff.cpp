@@ -169,6 +169,7 @@ void Matrix::rotate(float angle, Vector& rotationAxis) {
 	
 	if (this->rows == 4 && this->cols == 4) {
 		angle = degreesToRadians(angle);
+		rotationAxis.normalize();
 		float x = rotationAxis.elements[Coordinates::X];
 		float y = rotationAxis.elements[Coordinates::Y];
 		float z = rotationAxis.elements[Coordinates::Z];

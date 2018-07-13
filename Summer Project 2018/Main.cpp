@@ -2,7 +2,7 @@
 #include "GLFW\glfw3.h"
 #include <iostream>
 #include "Window.h"
-
+/*
 bool running;
 Matrix rotate(4, 4);
 /*
@@ -18,7 +18,7 @@ Vector bl3(0.0f, -0.5f, -0.5f);
 Vector br1(0.0f, 0.0f, 0.0f);
 Vector br2(0.5f, -0.5f, 0.0f);
 Vector br3(0.0f, -0.5f, -0.5f);*/
-Vector tl(-0.5, 0.5, 0);
+/*Vector tl(-0.5, 0.5, 0);
 Vector tr(0.5, 0.5, 0);
 Vector bl(-0.5, -0.5, 0);
 int width, height;
@@ -53,7 +53,7 @@ void init(int windowWidth, int windowHeight, int windowScale, const char* title)
 	glDepthRange(-10, 10);
 	*/
 
-	glEnable(GL_DEPTH_TEST);
+	/*glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 	glShadeModel(GL_SMOOTH);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
@@ -113,7 +113,7 @@ void init(int windowWidth, int windowHeight, int windowScale, const char* title)
 	br2 = rotate * br2;
 	br3 = rotate * br3;
 	*/
-	
+	/*
 	running = true;
 }
 
@@ -130,7 +130,7 @@ void render() {
 	We need to learn how to render vertices
 	*/
 
-
+/*
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	
@@ -174,7 +174,7 @@ void render() {
 	glVertex3f(br2.elements[Coordinates::X], br2.elements[Coordinates::Y], br2.elements[Coordinates::Z]);
 	glColor3f(0.72f, 0.36f, 0.62f);
 	glVertex3f(br3.elements[Coordinates::X], br3.elements[Coordinates::Y], br3.elements[Coordinates::Z]);
-	*/
+	*//*
 	glEnd();
 
 	glfwSwapBuffers(Window::window);
@@ -211,4 +211,4 @@ int main() {
 	const char* title = "boop";
 	init(width, height, scale, title);
 	loop();
-}
+}*/

@@ -170,7 +170,7 @@ bool init() {
 		Vector ij(1.0f, 1.0f, 0.0f);
 		Vector u(0.5f, 0.0f, 0.0f);
 		model.identity();
-#define THIRD	
+#define FIFTH
 #ifdef FIRST
 		// TEST ONE (only component i (1, 0, 0)):             PASSED
 		model.rotate(glfwGetTime() * 50.0f, i);
@@ -183,11 +183,19 @@ bool init() {
 		// TEST THREE (component i then j separately):        PASSED
 		model.rotate(glfwGetTime() * 50.0f, i);
 		model.rotate(glfwGetTime() * 50.0f, j);
+		for (int i = 0; i < 16; i++) {
+			std::cout << model.elements[i] << " ";
+		}
+		std::cout << std::endl;
 #endif
 #ifdef FOURTH
 		// TEST FOUR (component j then i separately):         FAILED
 		model.rotate(glfwGetTime() * 50.0f, j);				//- wrong rotation
 		model.rotate(glfwGetTime() * 50.0f, i);				//+ didn't deform/stretch
+		for (int i = 0; i < 16; i++) {
+			std::cout << model.elements[i] << " ";
+		}
+		std::cout << std::endl;
 #endif
 #ifdef FIFTH
 		// TEST FIVE (multiple components at the same time):  FAILED
