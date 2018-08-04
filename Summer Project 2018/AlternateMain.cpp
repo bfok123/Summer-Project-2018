@@ -3,13 +3,35 @@
 #include <iostream>
 #include "Window.h"
 #include "Shader.h"
+#include "Camera.h"
+#include "Mouse.h"
+#include "Entity.h"
 
 bool running;
+Camera camera(Vector(0, 0, 0));
 
 const unsigned int WIDTH = 800;
 const unsigned int HEIGHT = 450;
 const unsigned int SCALE = 3;
 const char* TITLE = "boop";
+
+bool firstMouseMovement = true;
+
+void mouseCallback(GLFWwindow* window, double x, double y) {
+	if (firstMouseMovement) {
+		Mouse::x = x;
+		Mouse::y = y;
+		firstMouseMovement = false;
+	}
+	//int width, height;
+	//glfwGetFramebufferSize(window, &width, &height);
+	Mouse::xOffset = x - Mouse::x;
+	Mouse::yOffset = y - Mouse::y;
+	Mouse::x = x;
+	Mouse::y = y;
+
+	camera.processMouseMovement(Mouse::xOffset, Mouse::yOffset);
+}
 
 bool init() {
 
@@ -31,6 +53,9 @@ bool init() {
 		return false;
 	}
 	glfwMakeContextCurrent(Window::window);
+	glfwSetMouseButtonCallback(Window::window, Mouse::mouseButtonCallback);
+	glfwSetCursorPosCallback(Window::window, mouseCallback);
+	glfwSetInputMode(Window::window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	//GLEW
 	GLenum error = glewInit();
@@ -108,17 +133,19 @@ bool init() {
 	   -0.5f,  0.5f,  0.5f,		0.0f, 0.0f, 1.0f,
 	   -0.5f,  0.5f, -0.5f,		1.0f, 1.0f, 1.0f,
 	};
-	Vector cubePositions[] = {
-		Vector(0.0f,  0.0f,  0.0f),
-		Vector(2.0f,  5.0f, -15.0f),
-		Vector(-1.5f, -2.2f, -2.5f),
-		Vector(-3.8f, -2.0f, -12.3f),
-		Vector(2.4f, -0.4f, -3.5f),
-		Vector(-1.7f,  3.0f, -7.5f),
-		Vector(1.3f, -2.0f, -2.5f),
-		Vector(1.5f,  2.0f, -2.5f),
-		Vector(1.5f,  0.2f, -1.5f),
-		Vector(-1.3f,  1.0f, -1.5f)
+
+	Entity cubes[] = {
+		Entity(0.0f,  0.0f,  0.0f, 1.0f, 1.0f, 1.0f),
+		Entity(2.0f,  5.0f, -15.0f, 1.0f, 1.0f, 1.0f),
+		Entity(-1.5f, -2.2f, -2.5f, 1.0f, 1.0f, 1.0f),
+		Entity(-3.8f, -2.0f, -12.3f, 1.0f, 1.0f, 1.0f),
+		Entity(2.4f, -0.4f, -3.5f, 1.0f, 1.0f, 1.0f),
+		Entity(-1.7f,  3.0f, -7.5f, 1.0f, 1.0f, 1.0f),
+		Entity(1.3f, -2.0f, -2.5f, 1.0f, 1.0f, 1.0f),
+		Entity(1.5f,  2.0f, -2.5f, 1.0f, 1.0f, 1.0f),
+		Entity(1.5f,  0.2f, -1.5f, 1.0f, 1.0f, 1.0f),
+		Entity(-1.3f,  1.0f, -1.5f, 1.0f, 1.0f, 1.0f),
+		//Entity(camera.position.elements[Coordinates::X], camera.position.elements[Coordinates::Y], camera.position.elements[Coordinates::Z] + camera.front.elements[Coordinates::Z], 5.0f, 5.0f, 5.0f)
 	};
 
 	unsigned int VBO, VAO/*, EBO*/;
@@ -139,7 +166,6 @@ bool init() {
 					  //ID  elements ... ... Stride of 6 * sizeof(float)     offset
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (3 * sizeof(float)));
 	glEnableVertexAttribArray(1); //1, because layout location for color is 1
-	
 
 	running = true;
 
@@ -148,11 +174,26 @@ bool init() {
 
 	while (!glfwWindowShouldClose(Window::window)) {
 		glfwPollEvents();
+		Matrix view(4, 4);
 
-		if (glfwGetKey(Window::window, GLFW_KEY_LEFT) == GLFW_PRESS)  x -= 0.01f;
-		if (glfwGetKey(Window::window, GLFW_KEY_RIGHT) == GLFW_PRESS) x += 0.01f;
-		if (glfwGetKey(Window::window, GLFW_KEY_UP) == GLFW_PRESS)    y += 0.01f;
-		if (glfwGetKey(Window::window, GLFW_KEY_DOWN) == GLFW_PRESS)  y -= 0.01f;
+		if (glfwGetKey(Window::window, GLFW_KEY_LEFT) == GLFW_PRESS) camera.processKeyboard(CameraMovement::LEFT, 0.3f);
+		if (glfwGetKey(Window::window, GLFW_KEY_RIGHT) == GLFW_PRESS) camera.processKeyboard(CameraMovement::RIGHT, 0.3f);
+		if (glfwGetKey(Window::window, GLFW_KEY_UP) == GLFW_PRESS)    camera.processKeyboard(CameraMovement::FORWARD, 0.3f);
+		if (glfwGetKey(Window::window, GLFW_KEY_DOWN) == GLFW_PRESS)  camera.processKeyboard(CameraMovement::BACKWARD, 0.3f);
+		
+		//cubes[10].x = camera.position.elements[Coordinates::X] + camera.front.elements[Coordinates::X];
+		//cubes[10].y = camera.position.elements[Coordinates::Y] + camera.front.elements[Coordinates::Y];
+		//cubes[10].z = camera.position.elements[Coordinates::Z] + camera.front.elements[Coordinates::Z];
+		
+		/*
+		std::cout << "camera: ";
+		for (int i = 0; i < 3; i++) {
+			std::cout << camera.position.elements[i] << " ";
+		}
+		std::cout << std::endl;
+		std::cout << "cube: ";
+		std::cout << cubes[10].x << " " << cubes[10].y << " " << cubes[10].z;
+		std::cout << std::endl;*/
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -160,7 +201,6 @@ bool init() {
 		shader.use();
 
 		Matrix model(4, 4);
-		Matrix view(4, 4);
 		Matrix projection(4, 4);
 
 
@@ -170,7 +210,8 @@ bool init() {
 		Vector ij(1.0f, 1.0f, 0.0f);
 		Vector u(0.5f, 0.0f, 0.0f);
 		model.identity();
-#define FIFTH
+		
+#define THIRD
 #ifdef FIRST
 		// TEST ONE (only component i (1, 0, 0)):             PASSED
 		model.rotate(glfwGetTime() * 50.0f, i);
@@ -181,12 +222,8 @@ bool init() {
 #endif
 #ifdef THIRD
 		// TEST THREE (component i then j separately):        PASSED
-		model.rotate(glfwGetTime() * 50.0f, i);
-		model.rotate(glfwGetTime() * 50.0f, j);
-		for (int i = 0; i < 16; i++) {
-			std::cout << model.elements[i] << " ";
-		}
-		std::cout << std::endl;
+		//model.rotate(glfwGetTime() * 50.0f, i);
+		//model.rotate(glfwGetTime() * 50.0f, j);
 #endif
 #ifdef FOURTH
 		// TEST FOUR (component j then i separately):         FAILED
@@ -215,24 +252,33 @@ bool init() {
 		// Vector b(sin(glfwGetTime()), cos(glfwGetTime()), -3.0f);
 		// Vector b(0.0f, 0.0f, -3.0f);
 		Vector b(0.0f, 0.0f, y);
-		view.identity();
+		
+		// camera/view transformation
+		/*float radius = 10.0f;
+		float camX = sin(glfwGetTime()) * radius;
+		float camZ = cos(glfwGetTime()) * radius;
+		view = lookAt(Vector(camX, 0.0f, camZ), Vector(0.0f, 0.0f, 0.0f), Vector(0.0f, 1.0f, 0.0f));
 		view.translate(b);
+		for (int i = 0; i < 4; i++) {
+			std::cout << view.elements[i] << " ";
+		}
+		std::cout << std::endl;*/
 
 							// fov    aspect                          near  far (render distance)
 		projection.perspective(45.0f, (float) WIDTH / (float) HEIGHT, 0.1f, 100.0f);
-		shader.setUniformMatrix4("model", model);
-		shader.setUniformMatrix4("view", view);
 		shader.setUniformMatrix4("projection", projection);
+		view = camera.getViewMatrix();
+		shader.setUniformMatrix4("view", view);
 
 		glBindVertexArray(VAO);
 		// glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
 		for (unsigned int i = 0; i < 10; i++) {
 			Matrix model(4, 4);
 			model.identity();
-			model.translate(cubePositions[i]);
-			float angle = 20.0f * i;
-			model.rotate(angle, ij);
+			model.translate(cubes[i].getPositionVector());
+			//float angle = 20.0f * i;
+			//model.rotate(angle, ij);
 			shader.setUniformMatrix4("model", model);
 			if (i != 0)
 				glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -268,14 +314,13 @@ void render() {
 
 void loop() {
 	unsigned int fpsCounter = 0;
+
 	double time = glfwGetTime();
 	double previousTime = glfwGetTime();
 	double interval = 1.0 / 1.0;
 	double difference = 0.0;
+	
 	while (running) {
-		double currentTime = glfwGetTime();
-		difference += (currentTime - previousTime) / interval;
-		previousTime = currentTime;
 		while (difference >= 1) {
 			update();
 			difference--;

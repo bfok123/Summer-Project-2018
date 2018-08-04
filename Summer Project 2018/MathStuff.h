@@ -18,6 +18,7 @@ struct Point {
 struct Vector {
 	float elements[4];
 
+	Vector();
 	Vector(float x, float y, float z);
 
 	//Vector& operator=(Vector right);
@@ -29,7 +30,7 @@ struct Vector {
 	friend Vector operator-(Vector left, const Vector& right);
 	friend Vector operator*(Vector left, const Vector& right); // cross product bc mark likes to do bad operator overloading
 
-	float dot(Vector& right);
+	float dot(Vector right);
 	float magnitude();
 	void normalize();
 	void scale(float scalar); // uniform scale
@@ -54,9 +55,9 @@ struct Matrix {
 	friend Vector operator*(Matrix left, const Vector& right);
 
 	void rotate(float angle, float x, float y, float z);
-	void rotate(float angle, Vector& rotationAxis);
+	void rotate(float angle, Vector rotationAxis);
 	void translate(float x, float y, float z);
-	void translate(Vector& v);
+	void translate(Vector v);
 	void transpose();
 	void identity();
 	void zero();
@@ -66,6 +67,6 @@ struct Matrix {
 	void perspective(float fieldOfView, float aspect, float near, float far);
 };
 
-
+Matrix lookAt(Vector eye, Vector target, Vector up);
 
 #endif

@@ -3,6 +3,10 @@
 
 Point::Point(float x, float y, float z) : x(x), y(y), z(z) {}
 
+Vector::Vector() {
+	Vector(0, 0, 0);
+}
+
 Vector::Vector(float x, float y, float z) {
 	elements[4];
 	elements[0] = x;
@@ -35,15 +39,22 @@ Vector& Vector::operator-=(const Vector& right) {
 	return *this;
 }
 
+Vector operator*(Vector left, const Vector& right) {
+	left *= right;
+	return left;
+}
+
 Vector& Vector::operator*=(const Vector& right) {
-	this->elements[Coordinates::X] = this->elements[Coordinates::Y] * right.elements[Coordinates::Z] - this->elements[Coordinates::Z] * right.elements[Coordinates::Y];
-	this->elements[Coordinates::Y] = -(this->elements[Coordinates::X] * right.elements[Coordinates::Z] - this->elements[Coordinates::Z] * right.elements[Coordinates::X]);
-	this->elements[Coordinates::Z] = this->elements[Coordinates::X] * right.elements[Coordinates::Y] - this->elements[Coordinates::Y] * right.elements[Coordinates::X];
+	Vector result(0, 0, 0);
+	result.elements[Coordinates::X] = this->elements[Coordinates::Y] * right.elements[Coordinates::Z] - this->elements[Coordinates::Z] * right.elements[Coordinates::Y];
+	result.elements[Coordinates::Y] = -(this->elements[Coordinates::X] * right.elements[Coordinates::Z] - this->elements[Coordinates::Z] * right.elements[Coordinates::X]);
+	result.elements[Coordinates::Z] = this->elements[Coordinates::X] * right.elements[Coordinates::Y] - this->elements[Coordinates::Y] * right.elements[Coordinates::X];
+	std::swap(result.elements, this->elements);
 	return *this;
 }
 
-float Vector::dot(Vector& right) {
-	return this->elements[Coordinates::X] * right.elements[Coordinates::X] + this->elements[Coordinates::Y] * right.elements[Coordinates::Y] + this->elements[Coordinates::Z] * right.elements[Coordinates::Z];
+float Vector::dot(Vector right) {
+	return (this->elements[Coordinates::X] * right.elements[Coordinates::X]) + (this->elements[Coordinates::Y] * right.elements[Coordinates::Y]) + (this->elements[Coordinates::Z] * right.elements[Coordinates::Z]);
 }
 
 float Vector::magnitude() {
@@ -165,7 +176,7 @@ void Matrix::rotate(float angle, float x, float y, float z) {
 	Matrix::rotate(angle, rotationAxis);
 }
 
-void Matrix::rotate(float angle, Vector& rotationAxis) {
+void Matrix::rotate(float angle, Vector rotationAxis) {
 	
 	if (this->rows == 4 && this->cols == 4) {
 		angle = degreesToRadians(angle);
@@ -250,7 +261,7 @@ void Matrix::translate(float x, float y, float z) {
 	}
 }
 
-void Matrix::translate(Vector& v) {
+void Matrix::translate(Vector v) {
 	translate(v.elements[Coordinates::X], v.elements[Coordinates::Y], v.elements[Coordinates::Z]);
 }
 
@@ -346,6 +357,29 @@ void Matrix::perspective(float fieldOfView, float aspect, float near, float far)
 		std::cout << "Given matrix must be 4x4 to turn into (symmetric) perspective projection matrix.";
 		std::cout << std::endl;
 	}
+}
+
+Matrix lookAt(Vector eye, Vector target, Vector up) {
+	Vector fwd = target - eye; // 0 0 1
+	fwd.normalize();
+	Vector side = fwd * up; // 1 0 0
+	side.normalize();
+	Vector y = fwd * side;
+	Matrix result(4, 4);
+	result.elements[0] = side.elements[Coordinates::X];
+	result.elements[1] = y.elements[Coordinates::X];
+	result.elements[2] = -fwd.elements[Coordinates::X];
+	result.elements[4] = side.elements[Coordinates::Y];
+	result.elements[5] = y.elements[Coordinates::Y];
+	result.elements[6] = -fwd.elements[Coordinates::Y];
+	result.elements[8] = side.elements[Coordinates::Z];
+	result.elements[9] = y.elements[Coordinates::Z];
+	result.elements[10] = -fwd.elements[Coordinates::Z];
+	result.elements[12] = -side.dot(eye);
+	result.elements[13] = -y.dot(eye);
+	result.elements[14] = -fwd.dot(eye);
+	result.elements[15] = 1;
+	return result;
 }
 
 //void 
