@@ -1,10 +1,8 @@
 #include "Camera.h"
 #include <iostream>
 
-Camera::Camera(Vector position = Vector()) : position(position), yaw(YAW), pitch(PITCH), movementSpeed(SPEED), mouseSensitivity(SENSITIVITY), zoom(ZOOM) {
+Camera::Camera(Vector position) : position(position), yaw(YAW), pitch(PITCH), movementSpeed(SPEED), mouseSensitivity(SENSITIVITY), zoom(ZOOM) {
 	worldUp = Vector(0.0f, 1.0f, 0.0f);
-	front = Vector(0.0f, 0.0f, -1.0f);
-	up = Vector(0.0f, 1.0f, 0.0f);
 	updateCameraVectors();
 }
 
@@ -13,13 +11,18 @@ void Camera::processKeyboard(CameraMovement direction, float deltaTime) {
 
 	Vector scaleFront = front;
 	Vector scaleRight = right;
+
+	// to lock the player on xz axis
+	scaleFront.elements[Coordinates::Y] = 0;
+	scaleRight.elements[Coordinates::Y] = 0;
+
 	scaleFront.scale(velocity);
 	scaleRight.scale(velocity);
 
-	if (direction == FORWARD) position -= scaleFront;
-	if (direction == BACKWARD) position += scaleFront;
-	if (direction == LEFT) position -= scaleRight;
-	if (direction == RIGHT) position += scaleRight;
+	if (direction == FORWARD) position += scaleFront;
+	if (direction == BACKWARD) position -= scaleFront;
+	if (direction == LEFT) position += scaleRight;
+	if (direction == RIGHT) position -= scaleRight;
 }
 
 void Camera::processMouseMovement(double xOffset, double yOffset, bool constrainPitch) {
@@ -52,12 +55,3 @@ void Camera::updateCameraVectors() {
 	up = front * right;
 	up.normalize();
 }
-/*
-void Camera::mouseUpdate(int xOffset, int yOffset) {
-	Matrix rot(4, 4);
-	rot.identity();
-	rot.rotate(-(float)xOffset * mouseSensitivity, up);
-	rot.rotate((float)yOffset * mouseSensitivity, right);
-	front = rot * front;
-	front.normalize();
-}*/

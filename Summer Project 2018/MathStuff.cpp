@@ -360,6 +360,7 @@ void Matrix::perspective(float fieldOfView, float aspect, float near, float far)
 }
 
 Matrix lookAt(Vector eye, Vector target, Vector up) {
+	/*
 	Vector fwd = target - eye; // 0 0 1
 	fwd.normalize();
 	Vector side = fwd * up; // 1 0 0
@@ -378,6 +379,29 @@ Matrix lookAt(Vector eye, Vector target, Vector up) {
 	result.elements[12] = -side.dot(eye);
 	result.elements[13] = -y.dot(eye);
 	result.elements[14] = -fwd.dot(eye);
+	result.elements[15] = 1;
+	return result;*/
+	Vector f = target - eye;
+	f.normalize();
+	Vector u = up;
+	u.normalize();
+	Vector s = f * u;
+	s.normalize();
+	u = s * f;
+
+	Matrix result(4, 4);
+	result.elements[0] = s.elements[Coordinates::X];
+	result.elements[1] = u.elements[Coordinates::X];
+	result.elements[2] = -f.elements[Coordinates::X];
+	result.elements[4] = s.elements[Coordinates::Y];
+	result.elements[5] = u.elements[Coordinates::Y];
+	result.elements[6] = -f.elements[Coordinates::Y];
+	result.elements[8] = s.elements[Coordinates::Z];
+	result.elements[9] = u.elements[Coordinates::Z];
+	result.elements[10] = -f.elements[Coordinates::Z];
+	result.elements[12] = -s.dot(eye);
+	result.elements[13] = -u.dot(eye);
+	result.elements[14] = f.dot(eye);
 	result.elements[15] = 1;
 	return result;
 }

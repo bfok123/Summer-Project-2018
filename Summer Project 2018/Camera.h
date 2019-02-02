@@ -27,7 +27,6 @@ struct Camera {
 	void processMouseMovement(double xOffset, double yOffset, bool constrainPitch = true);
 	Matrix getViewMatrix();
 	void updateCameraVectors();
-	void mouseUpdate(int xOffset, int yOffset);
 };
 
 #endif

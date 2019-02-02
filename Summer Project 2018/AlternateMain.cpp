@@ -8,7 +8,7 @@
 #include "Entity.h"
 
 bool running;
-Camera camera(Vector(0, 0, 0));
+Camera camera(Vector(0, 0, 5));
 
 const unsigned int WIDTH = 800;
 const unsigned int HEIGHT = 450;
@@ -26,7 +26,7 @@ void mouseCallback(GLFWwindow* window, double x, double y) {
 	//int width, height;
 	//glfwGetFramebufferSize(window, &width, &height);
 	Mouse::xOffset = x - Mouse::x;
-	Mouse::yOffset = y - Mouse::y;
+	Mouse::yOffset = Mouse::y - y;
 	Mouse::x = x;
 	Mouse::y = y;
 
@@ -176,10 +176,10 @@ bool init() {
 		glfwPollEvents();
 		Matrix view(4, 4);
 
-		if (glfwGetKey(Window::window, GLFW_KEY_LEFT) == GLFW_PRESS) camera.processKeyboard(CameraMovement::LEFT, 0.3f);
-		if (glfwGetKey(Window::window, GLFW_KEY_RIGHT) == GLFW_PRESS) camera.processKeyboard(CameraMovement::RIGHT, 0.3f);
-		if (glfwGetKey(Window::window, GLFW_KEY_UP) == GLFW_PRESS)    camera.processKeyboard(CameraMovement::FORWARD, 0.3f);
-		if (glfwGetKey(Window::window, GLFW_KEY_DOWN) == GLFW_PRESS)  camera.processKeyboard(CameraMovement::BACKWARD, 0.3f);
+		if (glfwGetKey(Window::window, GLFW_KEY_LEFT) == GLFW_PRESS) camera.processKeyboard(CameraMovement::LEFT, 0.01f);
+		if (glfwGetKey(Window::window, GLFW_KEY_RIGHT) == GLFW_PRESS) camera.processKeyboard(CameraMovement::RIGHT, 0.01f);
+		if (glfwGetKey(Window::window, GLFW_KEY_UP) == GLFW_PRESS)    camera.processKeyboard(CameraMovement::FORWARD, 0.01f);
+		if (glfwGetKey(Window::window, GLFW_KEY_DOWN) == GLFW_PRESS)  camera.processKeyboard(CameraMovement::BACKWARD, 0.01f);
 		
 		//cubes[10].x = camera.position.elements[Coordinates::X] + camera.front.elements[Coordinates::X];
 		//cubes[10].y = camera.position.elements[Coordinates::Y] + camera.front.elements[Coordinates::Y];
@@ -277,8 +277,8 @@ bool init() {
 			Matrix model(4, 4);
 			model.identity();
 			model.translate(cubes[i].getPositionVector());
-			//float angle = 20.0f * i;
-			//model.rotate(angle, ij);
+			float angle = 20.0f * i;
+			model.rotate(angle, ij);
 			shader.setUniformMatrix4("model", model);
 			if (i != 0)
 				glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -286,6 +286,7 @@ bool init() {
 
 
 		glfwSwapBuffers(Window::window);
+		glfwPollEvents();
 	}
 
 
